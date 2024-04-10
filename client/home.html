@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <div class="home">
+      <div class="createOrJoin">
+        <button class="createRoomBtn" onclick="createRoom()">
+          Create Room
+        </button>
+        <p>or</p>
+        <p>Join with Code</p>
+        <div class="joinWithCode">
+          <input type="text" class="writeRoomCode" placeholder="Room id" />
+          <button class="joinRoomBtn" onclick="joinRoom()">Join</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const socket = io();
+
+      function createRoom() {
+        socket.emit("createRoom");
+      }
+
+      function joinRoom() {
+        let roomUniqueId = document.querySelector(".writeRoomCode").value;
+        console.log(roomUniqueId);
+        socket.emit("joinRoom", { roomUniqueId: roomUniqueId });
+      }
+      socket.on("roomId", (data) => {
+        window.location.href = `http://localhost:3000/${data.roomId}`;
+      });
+    </script>
+  </body>
+</html>
