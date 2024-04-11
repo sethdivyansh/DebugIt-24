@@ -15,29 +15,33 @@
         <p>or</p>
         <p>Join with Code</p>
         <div class="joinWithCode">
-          <input type="text" class="roomUniqueId" placeholder="Room id" />
+          <input type="text" class="roomId" placeholder="Room id" />
           <button class="joinRoomBtn" onclick="joinRoom()">Join</button>
         </div>
       </div>
     </div>
     <script>
-      const socket = io();
-      let create = false;
-
+      function GenerateCode(length) {
+        var result = "";
+        var characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+        }
+        return result;
+      }
       function createRoom() {
-        create = true;
-        socket.emit("createRoom");
+        let roomId = GenerateCode(6);
+        window.location.href = `http://localhost:3000/game/${roomId}`;
       }
 
       function joinRoom() {
-        create = false;
-        let roomUniqueId = document.querySelector(".roomUniqueId").value;
-        console.log(roomUniqueId);
-        socket.emit("joinRoom", { roomUniqueId: roomUniqueId });
+        let roomId = document.querySelector(".roomId").value;
+        window.location.href = `http://localhost:3000/game/${roomId}`;
       }
-      socket.on("roomId", (data) => {
-        window.location.href = `http://localhost:3000/game/${data.roomId}?gameHost=${create}`;
-      });
     </script>
   </body>
 </html>

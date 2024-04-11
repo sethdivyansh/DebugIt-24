@@ -43,43 +43,13 @@ io.on("connection", (socket) => {
     console.log("a user disconnected");
   });
 
-  socket.on("createRoom", (data) => {
-    const roomId = GenerateCode(6);
-    rooms[roomId] = {};
-    // socket.join(roomId);
-    socket.emit("roomId", { roomId: roomId });
-    console.log(roomId);
-    redirectToGameRoom(roomId);
-
-    // const silence = new Kitten({ name: "Silence" });
-    // console.log(silence.name); // 'Silence'
-  });
-
-  socket.on("i am reconnected", (data) => {
-    console.log("user reconnected");
-    socket.join(data.roomId);
-    console.log("user joined the room");
-    const clients = io.sockets.adapter.rooms.get(`${data.roomId}`);
-
-    //to get the number of clients in this room
-    const numClients = clients ? clients.size : 0;
-
-    console.log(`Number of clients in ${data.roomId}: ${numClients}`);
-    socket
-      .to(data.roomId)
-      .emit("number of players", { numClients: numClients });
-  });
-
-  socket.on("joinRoom", (data) => {
-    if (rooms[data.roomUniqueId] != null) {
-      socket.emit("roomId", { roomId: data.roomUniqueId });
-      redirectToGameRoom(data.roomUniqueId);
-    } else {
-      console.log("Wrong code");
+  socket.on("join_room", (data) => {
+    if (!rooms[data.roomId]) {
+      rooms[data.roomId] = {};
     }
-  });
+    console.log("Join room ", data.roomId);
+    socket.join(data.roomId);
 
-  socket.on("playerName", (data) => {
     if (data.name != false) {
       if (rooms[data.roomId].players) {
         rooms[data.roomId].players.push(data.name);
@@ -87,27 +57,16 @@ io.on("connection", (socket) => {
         rooms[data.roomId].players = [data.name];
       }
     }
-    socket.to(data.roomId).emit("player join", { player: rooms[data.roomId] });
+    io.to(data.roomId).emit("player_joined", {
+      players: rooms[data.roomId].players,
+    });
   });
 });
 
-redirectToGameRoom = (id) => {
-  app.get(`/game/${id}`, (req, res) => {
-    res.sendFile(__dirname + "/client/game.html");
-  });
-};
+app.get(`/game/:id`, (req, res) => {
+  res.sendFile(__dirname + "/client/game.html");
+});
 
 server.listen(3000, () => {
   console.log("Running on port: 3000");
 });
-
-function GenerateCode(length) {
-  var result = "";
-  var characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
