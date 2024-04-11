@@ -15,25 +15,28 @@
         <p>or</p>
         <p>Join with Code</p>
         <div class="joinWithCode">
-          <input type="text" class="writeRoomCode" placeholder="Room id" />
+          <input type="text" class="roomUniqueId" placeholder="Room id" />
           <button class="joinRoomBtn" onclick="joinRoom()">Join</button>
         </div>
       </div>
     </div>
     <script>
       const socket = io();
+      let create = false;
 
       function createRoom() {
+        create = true;
         socket.emit("createRoom");
       }
 
       function joinRoom() {
-        let roomUniqueId = document.querySelector(".writeRoomCode").value;
+        create = false;
+        let roomUniqueId = document.querySelector(".roomUniqueId").value;
         console.log(roomUniqueId);
         socket.emit("joinRoom", { roomUniqueId: roomUniqueId });
       }
       socket.on("roomId", (data) => {
-        window.location.href = `http://localhost:3000/${data.roomId}`;
+        window.location.href = `http://localhost:3000/game/${data.roomId}?gameHost=${create}`;
       });
     </script>
   </body>
