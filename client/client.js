@@ -4,18 +4,27 @@ const roomId = window.location.pathname.split("/").pop();
 
 console.log("roomId: ", roomId);
 
-let name;
-let number_of_rounds;
-let numClients = 0;
+let player_name;
 
-const enterBtn = document.querySelector(".enterBtn");
+const enter_btn = document.querySelector(".enterBtn");
 
-enterBtn.addEventListener("click", () => {
-  name = document.querySelector(".name").value;
+enter_btn.addEventListener("click", () => {
+  player_name = document.querySelector(".name").value;
 
-  socket.emit("join_room", { name: name, roomId: roomId });
+  document.querySelector("#playerName").style.display = "none";
+  socket.emit("join_room", { player_name: player_name, roomId: roomId });
 });
 
 socket.on("player_joined", (data) => {
   console.log("Player Joined: ", data);
+  const players = data.players;
+  if (players.includes(player_name)) {
+    console.log(`Player ${player_name} joined`);
+  }
+  document.querySelector(".waitingArea").style.display = "block";
+  document.querySelector("#player1").innerText = players[0];
+});
+
+socket.on("start_game", () => {
+  // to do start game
 });

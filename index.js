@@ -48,18 +48,30 @@ io.on("connection", (socket) => {
       rooms[data.roomId] = {};
     }
     console.log("Join room ", data.roomId);
-    socket.join(data.roomId);
 
-    if (data.name != false) {
+    if (data.player_name != false) {
       if (rooms[data.roomId].players) {
-        rooms[data.roomId].players.push(data.name);
+        if (rooms[data.roomId].players.length == 2) {
+          console.log("Max limit reached");
+          return;
+        }
+        rooms[data.roomId].players.push(data.player_name);
       } else {
-        rooms[data.roomId].players = [data.name];
+        rooms[data.roomId].players = [data.player_name];
       }
+      if (!rooms[data.roomId].moves) {
+        rooms[data.roomId].moves = {};
+      }
+      rooms[data.roomId].moves[data.player_name] = [];
     }
-    io.to(data.roomId).emit("player_joined", {
-      players: rooms[data.roomId].players,
-    });
+    socket.join(data.roomId);
+    if (rooms[data.roomId].players.length < 2) {
+      io.to(data.roomId).emit("player_joined", {
+        players: rooms[data.roomId].players,
+      });
+    } else {
+      io.to(data.roomId).emit("start_game");
+    }
   });
 });
 
