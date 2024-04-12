@@ -79,6 +79,10 @@ app.get(`/game/:id`, (req, res) => {
   res.sendFile(__dirname + "/client/game.html");
 });
 
+app.get("/room_exists", (req, res) => {
+  res.json({ rooms: rooms });
+});
+
 server.listen(3000, () => {
   console.log("Running on port: 3000");
 });

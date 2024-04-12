@@ -10,9 +10,10 @@ const enter_btn = document.querySelector(".enterBtn");
 
 enter_btn.addEventListener("click", () => {
   player_name = document.querySelector(".name").value;
-
-  document.querySelector("#playerName").style.display = "none";
-  socket.emit("join_room", { player_name: player_name, roomId: roomId });
+  if (player_name != false) {
+    document.querySelector("#playerName").style.display = "none";
+    socket.emit("join_room", { player_name: player_name, roomId: roomId });
+  }
 });
 
 socket.on("player_joined", (data) => {
