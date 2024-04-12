@@ -65,15 +65,25 @@ io.on("connection", (socket) => {
       rooms[data.roomId].moves[data.player_name] = [];
     }
     socket.join(data.roomId);
-    if (rooms[data.roomId].players.length < 2) {
+    if (rooms[data.roomId].players.length <= 2) {
       io.to(data.roomId).emit("player_joined", {
         players: rooms[data.roomId].players,
       });
-    } else {
-      io.to(data.roomId).emit("start_game");
     }
+    if (rooms[data.roomId].players.length == 2) {
+      rooms[data.roomId].playerMoveValue = {
+        player1: "X",
+        player2: "O",
+      };
+      io.to(data.roomId).emit("start_game", { rooms: rooms });
+    }
+    socket.on("playing", (data) => {
+      rooms[data.roomId].moves[data.player_name].push(data.btn_no);
+    });
   });
 });
+
+// APIs
 
 app.get(`/game/:id`, (req, res) => {
   res.sendFile(__dirname + "/client/game.html");
@@ -81,6 +91,11 @@ app.get(`/game/:id`, (req, res) => {
 
 app.get("/room_exists", (req, res) => {
   res.json({ rooms: rooms });
+});
+
+app.get("/players_in_room", (req, res) => {
+  res.json({ room_data: rooms });
+  console.log("Server: Player join ");
 });
 
 server.listen(3000, () => {

@@ -7,15 +7,49 @@
     <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
+    <h1>Tic Tac Toe</h1>
     <div id="playerName">
       <p>Enter your name</p>
       <input type="text" class="name" placeholder="Name" />
       <button class="enterBtn">Enter</button>
     </div>
-
     <div class="waitingArea" style="display: none">
-      <div id="player1"></div>
-      <div id="player2"></div>
+      <!-- <p class="players_in_game">Players</p> -->
+      <div class="user_cont">
+        You:
+        <div id="user_name"></div>
+      </div>
+      <div class="opp_cont">
+        Opponent:
+        <p class="waitingMsg">Waiting for other to join</p>
+        <div id="opp_name"></div>
+      </div>
+    </div>
+
+    <div id="gameRoom" style="display: none">
+      <div class="you_are_cont">
+        You are:
+        <div class="you_are"></div>
+      </div>
+      <div class="whose_turn_cont">
+        <div class="whose_turn"></div>
+        <div>turn</div>
+      </div>
+      <div class="row1">
+        <button id="btn1" class="btn" value="1"></button>
+        <button id="btn2" class="btn" value="2"></button>
+        <button id="btn3" class="btn" value="3"></button>
+      </div>
+      <div class="row2">
+        <button id="btn4" class="btn" value="4"></button>
+        <button id="btn5" class="btn" value="5"></button>
+        <button id="btn6" class="btn" value="6"></button>
+      </div>
+      <div class="row3">
+        <button id="btn7" class="btn" value="7"></button>
+        <button id="btn8" class="btn" value="8"></button>
+        <button id="btn9" class="btn" value="9"></button>
+      </div>
     </div>
     <script src="/client.js"></script>
   </body>
