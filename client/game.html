@@ -35,22 +35,33 @@
         <div class="whose_turn"></div>
         <div>turn</div>
       </div>
-      <div class="row1">
-        <button id="btn1" class="btn" value="1"></button>
-        <button id="btn2" class="btn" value="2"></button>
-        <button id="btn3" class="btn" value="3"></button>
+      <div class="game_board">
+        <div class="row1">
+          <button id="btn1" class="btn" value="0"></button>
+          <button id="btn2" class="btn" value="1"></button>
+          <button id="btn3" class="btn" value="2"></button>
+        </div>
+        <div class="row2">
+          <button id="btn4" class="btn" value="3"></button>
+          <button id="btn5" class="btn" value="4"></button>
+          <button id="btn6" class="btn" value="5"></button>
+        </div>
+        <div class="row3">
+          <button id="btn7" class="btn" value="6"></button>
+          <button id="btn8" class="btn" value="7"></button>
+          <button id="btn9" class="btn" value="8"></button>
+        </div>
       </div>
-      <div class="row2">
-        <button id="btn4" class="btn" value="4"></button>
-        <button id="btn5" class="btn" value="5"></button>
-        <button id="btn6" class="btn" value="6"></button>
-      </div>
-      <div class="row3">
-        <button id="btn7" class="btn" value="7"></button>
-        <button id="btn8" class="btn" value="8"></button>
-        <button id="btn9" class="btn" value="9"></button>
+      <div class="game_over" style="display: none">
+        <div>
+          <h2 class="game_over_text">Game Over!</h2>
+        </div>
+        <div>
+          <p class="winner"></p>
+        </div>
       </div>
     </div>
+    <div id="room_full_msg"></div>
     <script src="/client.js"></script>
   </body>
 </html>

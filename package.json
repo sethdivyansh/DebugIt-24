@@ -1,14 +1,14 @@
 {
   "name": "multiplayer-card-game",
   "version": "1.0.0",
-  "description": "realtime multiplayer card game",
+  "description": "realtime multiplayer tic-tac-toe game",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": "nodemon run index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Divyansh Seth",
   "license": "ISC",
   "dependencies": {
     "express": "^4.19.2",

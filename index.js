@@ -33,9 +33,16 @@ app.use(express.static(path.join(__dirname, "client")));
 
 const rooms = {};
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/client/home.html");
-});
+const winPatterns = [
+  [0, 1, 2],
+  [0, 3, 6],
+  [0, 4, 8],
+  [1, 4, 7],
+  [2, 5, 8],
+  [2, 4, 6],
+  [3, 4, 5],
+  [6, 7, 8],
+];
 
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -49,21 +56,22 @@ io.on("connection", (socket) => {
     }
     console.log("Join room ", data.roomId);
 
-    if (data.player_name != false) {
-      if (rooms[data.roomId].players) {
-        if (rooms[data.roomId].players.length == 2) {
-          console.log("Max limit reached");
-          return;
-        }
-        rooms[data.roomId].players.push(data.player_name);
-      } else {
-        rooms[data.roomId].players = [data.player_name];
+    if (rooms[data.roomId].players) {
+      // other player join the room
+      if (rooms[data.roomId].players.length == 2) {
+        // third player join
+        socket.emit("room_full");
+        return;
       }
-      if (!rooms[data.roomId].moves) {
-        rooms[data.roomId].moves = {};
-      }
-      rooms[data.roomId].moves[data.player_name] = [];
+      rooms[data.roomId].players.push(data.player_name);
+    } else {
+      rooms[data.roomId].players = [data.player_name]; //host join the room
     }
+    if (!rooms[data.roomId].moves) {
+      rooms[data.roomId].moves = {};
+    }
+    rooms[data.roomId].moves[data.player_name] = []; // create moves array for the joined player
+
     socket.join(data.roomId);
     if (rooms[data.roomId].players.length <= 2) {
       io.to(data.roomId).emit("player_joined", {
@@ -86,6 +94,7 @@ io.on("connection", (socket) => {
         next_turn = "X";
       }
       io.to(data.roomId).emit("playing", {
+        player_name: data.player_name,
         turn: data.turn,
         rooms,
         next_turn,
@@ -96,6 +105,10 @@ io.on("connection", (socket) => {
 });
 
 // APIs
+
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/client/home.html");
+});
 
 app.get(`/game/:id`, (req, res) => {
   res.sendFile(__dirname + "/client/game.html");

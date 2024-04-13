@@ -1,12 +1,23 @@
 const socket = io();
 
 const roomId = window.location.pathname.split("/").pop();
-
-let player_name;
 const you_are = document.querySelector(".you_are");
 const enter_btn = document.querySelector(".enterBtn");
+const tic_tac_btns = document.querySelectorAll(".btn");
+const gameover_pop = document.querySelector(".game_over");
+const gameover_msg = document.querySelector(".winner");
+let player_name;
 
-let tic_tac_btns = document.querySelectorAll(".btn");
+const winPatterns = [
+  [0, 1, 2],
+  [0, 3, 6],
+  [0, 4, 8],
+  [1, 4, 7],
+  [2, 5, 8],
+  [2, 4, 6],
+  [3, 4, 5],
+  [6, 7, 8],
+];
 
 enter_btn.addEventListener("click", () => {
   player_name = document.querySelector(".name").value.trim();
@@ -24,9 +35,6 @@ tic_tac_btns.forEach((button) => {
       return;
     }
     const btn_no = button.value;
-    // button.disabled = true;
-    button.innerText = turn;
-    button.disabled = true;
     socket.emit("playing", {
       disabled_btn: button.id,
       turn: turn,
@@ -37,28 +45,9 @@ tic_tac_btns.forEach((button) => {
   });
 });
 
-socket.on("playing", (data) => {
-  document.querySelector(`#${data.disabled_btn}`).disabled = true;
-  document.querySelector(`#${data.disabled_btn}`).innerText = data.turn;
-  document.querySelector(".whose_turn").innerText = data.next_turn;
-});
+// Sockets
 
 socket.on("player_joined", (data) => {
-  console.log("Player Joined: ", data);
-  const players = data.players;
-  if (players.includes(player_name)) {
-    console.log(`Player ${player_name} joined`);
-  }
-
-  socket.on("start_game", (data) => {
-    document.querySelector(".whose_turn").innerText = "X";
-    if (player_name === data.rooms[roomId].players[0]) {
-      you_are.innerText = "X";
-    } else {
-      you_are.innerText = "O";
-    }
-  });
-
   fetch("/players_in_room")
     .then((res) => res.json())
     .then((data) => {
@@ -72,13 +61,8 @@ socket.on("player_joined", (data) => {
           document.querySelector("#opp_name").innerText = players.players[1];
         else {
           document.querySelector("#opp_name").innerText = players.players[0];
-
-          // tic_tac_btns.forEach((b) => {
-          //   b.disabled = true;
-          // });
         }
         document.querySelector(".waitingMsg").style.display = "none";
-        console.log("Time to start the game");
       }
     })
     .catch((err) => {
@@ -86,6 +70,52 @@ socket.on("player_joined", (data) => {
     });
 });
 
-socket.on("start_game", () => {
-  // to do start game
+socket.on("start_game", (data) => {
+  document.querySelector(".whose_turn").innerText = "X";
+  if (player_name === data.rooms[roomId].players[0]) {
+    you_are.innerText = "X";
+  } else {
+    you_are.innerText = "O";
+  }
+});
+
+socket.on("playing", (data) => {
+  document.querySelector(`#${data.disabled_btn}`).disabled = true;
+  document.querySelector(`#${data.disabled_btn}`).innerText = data.turn;
+  let check = check_win_loose();
+  if (check) {
+    game_over(data.player_name);
+  }
+  document.querySelector(".whose_turn").innerText = data.next_turn;
+});
+
+const check_win_loose = () => {
+  for (let pattern of winPatterns) {
+    const pos1val = tic_tac_btns[pattern[0]].innerText;
+    const pos2val = tic_tac_btns[pattern[1]].innerText;
+    const pos3val = tic_tac_btns[pattern[2]].innerText;
+
+    if (pos1val != "" && pos2val != "" && pos3val != "") {
+      if (pos1val == pos2val && pos2val == pos3val) {
+        tic_tac_btns.forEach((btn) => {
+          btn.disabled = true;
+        });
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const game_over = (pos1val) => {
+  gameover_pop.style.display = "flex";
+  gameover_msg.innerText = pos1val + " wins";
+};
+
+socket.on("room_full", () => {
+  const room_full = document.querySelector("#room_full_msg");
+  room_full.innerText = "Room is full";
+  setTimeout(function redirect_to_home_page() {
+    window.location.href = `http://localhost:3000`;
+  }, 10000);
 });
