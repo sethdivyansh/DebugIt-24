@@ -72,13 +72,25 @@ io.on("connection", (socket) => {
     }
     if (rooms[data.roomId].players.length == 2) {
       rooms[data.roomId].playerMoveValue = {
-        player1: "X",
-        player2: "O",
+        X: rooms[data.roomId].players[0],
+        Y: rooms[data.roomId].players[1],
       };
       io.to(data.roomId).emit("start_game", { rooms: rooms });
     }
     socket.on("playing", (data) => {
       rooms[data.roomId].moves[data.player_name].push(data.btn_no);
+      let next_turn = "";
+      if (data.turn == "X") {
+        next_turn = "O";
+      } else {
+        next_turn = "X";
+      }
+      io.to(data.roomId).emit("playing", {
+        turn: data.turn,
+        rooms,
+        next_turn,
+        disabled_btn: data.disabled_btn,
+      });
     });
   });
 });

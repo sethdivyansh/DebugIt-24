@@ -2,11 +2,11 @@ const socket = io();
 
 const roomId = window.location.pathname.split("/").pop();
 
-console.log("roomId: ", roomId);
-
 let player_name;
-
+const you_are = document.querySelector(".you_are");
 const enter_btn = document.querySelector(".enterBtn");
+
+let tic_tac_btns = document.querySelectorAll(".btn");
 
 enter_btn.addEventListener("click", () => {
   player_name = document.querySelector(".name").value.trim();
@@ -16,24 +16,31 @@ enter_btn.addEventListener("click", () => {
   }
 });
 
-document.querySelectorAll(".btn").forEach((button) => {
+tic_tac_btns.forEach((button) => {
   button.addEventListener("click", () => {
     const turn = document.querySelector(".whose_turn").textContent;
+    if (turn != you_are.innerText) {
+      console.log("Its not your turn");
+      return;
+    }
     const btn_no = button.value;
     // button.disabled = true;
-
-    // if (turn == "X") {
-    //   turn.innerText = "O";
-    // } else {
-    //   turn.innerText = "X";
-    // }
-
+    button.innerText = turn;
+    button.disabled = true;
     socket.emit("playing", {
+      disabled_btn: button.id,
+      turn: turn,
       roomId: roomId,
       btn_no: btn_no,
       player_name: player_name,
     });
   });
+});
+
+socket.on("playing", (data) => {
+  document.querySelector(`#${data.disabled_btn}`).disabled = true;
+  document.querySelector(`#${data.disabled_btn}`).innerText = data.turn;
+  document.querySelector(".whose_turn").innerText = data.next_turn;
 });
 
 socket.on("player_joined", (data) => {
@@ -45,11 +52,10 @@ socket.on("player_joined", (data) => {
 
   socket.on("start_game", (data) => {
     document.querySelector(".whose_turn").innerText = "X";
-    console.log("start game: ", data.rooms[roomId].players[0]);
     if (player_name === data.rooms[roomId].players[0]) {
-      document.querySelector(".you_are").innerText = "X";
+      you_are.innerText = "X";
     } else {
-      document.querySelector(".you_are").innerText = "O";
+      you_are.innerText = "O";
     }
   });
 
@@ -57,7 +63,6 @@ socket.on("player_joined", (data) => {
     .then((res) => res.json())
     .then((data) => {
       const players = data.room_data[roomId];
-      console.log(players);
       document.querySelector(".waitingArea").style.display = "block";
       document.querySelector("#user_name").innerText = player_name;
 
@@ -67,6 +72,10 @@ socket.on("player_joined", (data) => {
           document.querySelector("#opp_name").innerText = players.players[1];
         else {
           document.querySelector("#opp_name").innerText = players.players[0];
+
+          // tic_tac_btns.forEach((b) => {
+          //   b.disabled = true;
+          // });
         }
         document.querySelector(".waitingMsg").style.display = "none";
         console.log("Time to start the game");
