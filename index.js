@@ -5,44 +5,12 @@ const app = express();
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
-const mongoose = require("mongoose");
-
-main().catch((err) => console.log(err));
-
-async function main() {
-  await mongoose.connect(
-    "mongodb+srv://divyanshseth08:7f4fvYahGyb0MegW@cluster0.vepo2dn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  );
-
-  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
-}
-
-const gameSchema = new mongoose.Schema({
-  roomId: String,
-  player1Name: String,
-  player2Name: String,
-});
-
-const Game = mongoose.model("Game", gameSchema);
-
 const io = new Server(server, {
   connectionStateRecovery: {},
 });
 
 app.use(express.static(path.join(__dirname, "client")));
-
 const rooms = {};
-
-const winPatterns = [
-  [0, 1, 2],
-  [0, 3, 6],
-  [0, 4, 8],
-  [1, 4, 7],
-  [2, 5, 8],
-  [2, 4, 6],
-  [3, 4, 5],
-  [6, 7, 8],
-];
 
 io.on("connection", (socket) => {
   console.log("a user connected");
@@ -101,6 +69,18 @@ io.on("connection", (socket) => {
         disabled_btn: data.disabled_btn,
       });
     });
+    socket.on("restart_game", () => {
+      io.to(data.roomId).emit("restart_game");
+    });
+
+    // socket.on("disconnect", () => {
+    //   if (rooms[data.roomId]) {
+    //     rooms[data.roomId] = rooms[data.roomId].filter(
+    //       (user) => user !== data.player_name
+    //     );
+    //     rooms[data];
+    //   }
+    // });
   });
 });
 

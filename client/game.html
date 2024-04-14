@@ -6,63 +6,193 @@
     <title>Document</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .btn {
+        background-color: azure;
+        width: 10rem;
+        height: 10rem;
+        border-radius: 0.5rem;
+        font-size: 6rem;
+      }
+      .squares {
+        z-index: -1;
+      }
+      .row {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+      }
+
+      .restart_button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #1d66f8;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 0.5rem;
+      }
+
+      .restart_button:hover {
+        background-color: #45a049;
+      }
+    </style>
   </head>
-  <body>
-    <h1>Tic Tac Toe</h1>
-    <div id="playerName">
-      <p>Enter your name</p>
-      <input type="text" class="name" placeholder="Name" />
-      <button class="enterBtn">Enter</button>
-    </div>
-    <div class="waitingArea" style="display: none">
-      <!-- <p class="players_in_game">Players</p> -->
-      <div class="user_cont">
-        You:
-        <div id="user_name"></div>
+  <body
+    class="bg-[#171941] bg-contain bg-fixed"
+    style="background-image: url('./images/dots.png')"
+  >
+    <div class="game">
+      <div class="squares">
+        <div
+          class="squares square1 h-[18.75rem] left-[3%] opacity-[0.5] top-[-21%] w-[16.75rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square2 h-[25rem] right-[-5%] opacity-[0.4] top-[-12%] w-[25rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square3 h-[12.5rem] left-[-5%] bottom-0 opacity-[0.1] w-[12.5rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square4 h-[18.75rem] right-[-5%] bottom-0 opacity-[0.1] w-[18.75rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square5 h-[15.625rem] bottom-[29%] left-[32%] opacity-[0.1] w-[15.625rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+
+        <div
+          class="squares square6 h-[5rem] left-[10%] top-[35%] bottom-0 opacity-[0.8] w-[5rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
       </div>
-      <div class="opp_cont">
-        Opponent:
-        <p class="waitingMsg">Waiting for other to join</p>
+      <h1 class="text-[3.5rem] text-center text-white mt-[1rem]">
+        Tic-Tac-Toe!
+      </h1>
+      <div
+        id="playerName"
+        class="text-white absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 text-center text-[1.75rem] font-semibold"
+      >
+        <h1 class="text-[3.5rem]">Hello!</h1>
+        <button
+          class="back_to_home bg-[#1d8cf8] rounded-lg w-[17.25rem] md:w-[30rem] p-[1rem] m-[1rem] font-thin bg-gradient-to-bl from-[#1d8cf8] via-[#1d66f8] to-[#3358f4] mb-[2rem]"
+        >
+          Cancel
+        </button>
+        <p>Your Name</p>
+        <div
+          class="flex flex-col md:flex-row items-center md:justify-between w-[30rem] m-[1rem]"
+        >
+          <input
+            type="text"
+            class="name font-thin border-[#2b3553] border-solid bg-transparent border-[1px] p-[1rem] rounded-lg w-[18rem] md:w-[20rem] mb-[0.75rem] md:mb-0"
+            placeholder="Name"
+          />
+          <button
+            class="enterBtn bg-[#1d8cf8] rounded-lg font-thin w-[18rem] md:w-[8rem] p-[0.75rem] md:p-[1rem] bg-gradient-to-bl from-[#1d8cf8] via-[#1d66f8] to-[#3358f4]"
+          >
+            Enter
+          </button>
+        </div>
+      </div>
+      <div class="waitingArea" style="display: none">
+        <!-- <p class="players_in_game">Players</p> -->
+        <div class="absolute top-[26%] left-[12%]">
+          <p class="text-[1.5rem] text-white font-light mb-[0.1rem]">
+            Invite Player
+          </p>
+          <div class="room_code_msg text-[#d1d1da] font-thin flex gap-2">
+            Room Code is
+            <button
+              class="room_code bg-[#1d8cf8] rounded-md font-semibold text-white mb-[0.75rem] w-[4.5rem]"
+            ></button>
+          </div>
+          <div class="room_link_cont flex">
+            <input
+              class="room_link bg-[#1d253b] w-[18rem] p-[.75rem] border-[#2b3553] border-solid border-[1px] border-r-0 rounded-md rounded-r-none"
+              type="text"
+              disabled
+            />
+            <button
+              class="w-[2rem] bg-[#1d253b] border-[#2b3553] border-solid border-[1px] border-l-0 rounded-md rounded-l-none"
+            >
+              <img src="./images/copy.svg" class="copy_link_btn" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="player_name top-[15%] text-[3.25rem] text-[#bbbbc7] flex justify-around"
+      >
+        <div id="user_name"></div>
         <div id="opp_name"></div>
       </div>
+      <div id="gameRoom" style="display: none">
+        <div
+          class="you_are_cont text-[#f9e36e] flex flex-row gap-4 text-[3rem] absolute left-[10%] top-[24%]"
+        >
+          <p>You are</p>
+          <div class="you_are"></div>
+        </div>
+        <div
+          class="whose_turn_cont flex flex-row justify-center gap-4 text-[#1e90ff] text-[4rem] h-[6rem]"
+        >
+          <div class="whose_turn mb-[0.25rem]"></div>
+          <div>turn</div>
+        </div>
+        <div class="game_board flex justify-center flex-col items-center gap-4">
+          <div class="row">
+            <button id="btn1" class="btn" value="0"></button>
+            <button id="btn2" class="btn" value="1"></button>
+            <button id="btn3" class="btn" value="2"></button>
+          </div>
+          <div class="row">
+            <button id="btn4" class="btn" value="3"></button>
+            <button id="btn5" class="btn" value="4"></button>
+            <button id="btn6" class="btn" value="5"></button>
+          </div>
+          <div class="row">
+            <button id="btn7" class="btn" value="6"></button>
+            <button id="btn8" class="btn" value="7"></button>
+            <button id="btn9" class="btn" value="8"></button>
+          </div>
+        </div>
+        <div
+          class="game_over fixed top-[50%] left-[50%] justify-around items-center h-[45vh] w-[30vw] text-center bg-[#f2f2f2] rounded-md flex-col shadow-md transform -translate-x-1/2 -translate-y-1/2"
+          style="display: none"
+        >
+          <div>
+            <h2 class="game_over_text text-[#ea2f2f] text-[2.5rem] font-bold">
+              Game Over!
+            </h2>
+          </div>
+          <div>
+            <p
+              class="winner m-[-3.5rem] text-[2rem] font-bold text-[#1d8cf8]"
+            ></p>
+          </div>
+          <div class="restart_game_div">
+            <button
+              class="restart_button pl-[20px] pr-[20px] pt-[10px] pb-[10px] font-[1rem] text-white rounded-lg hover:bg-[#3358f4]"
+            >
+              Restart Game
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        id="room_full"
+        class="fixed top-[50%] left-[50%] justify-around items-center h-[45vh] w-[30vw] text-center bg-gradient-to-r from-[#3358f4] to-[#1d8cf8] rounded-md flex-col shadow-md transform -translate-x-1/2 -translate-y-1/2"
+        style="display: none"
+      >
+        <div id="room_full_msg" class="text-[2rem] font-bold text-[#d1d1da]">
+          Room is Full
+        </div>
+        <button
+          class="back_to_home bg-[#d1d1da] rounded-lg p-[1rem] m-[1rem] font-thin shadow-xl w-[20vw]"
+        >
+          Home
+        </button>
+      </div>
     </div>
-
-    <div id="gameRoom" style="display: none">
-      <div class="you_are_cont">
-        You are:
-        <div class="you_are"></div>
-      </div>
-      <div class="whose_turn_cont">
-        <div class="whose_turn"></div>
-        <div>turn</div>
-      </div>
-      <div class="game_board">
-        <div class="row1">
-          <button id="btn1" class="btn" value="0"></button>
-          <button id="btn2" class="btn" value="1"></button>
-          <button id="btn3" class="btn" value="2"></button>
-        </div>
-        <div class="row2">
-          <button id="btn4" class="btn" value="3"></button>
-          <button id="btn5" class="btn" value="4"></button>
-          <button id="btn6" class="btn" value="5"></button>
-        </div>
-        <div class="row3">
-          <button id="btn7" class="btn" value="6"></button>
-          <button id="btn8" class="btn" value="7"></button>
-          <button id="btn9" class="btn" value="8"></button>
-        </div>
-      </div>
-      <div class="game_over" style="display: none">
-        <div>
-          <h2 class="game_over_text">Game Over!</h2>
-        </div>
-        <div>
-          <p class="winner"></p>
-        </div>
-      </div>
-    </div>
-    <div id="room_full_msg"></div>
     <script src="/client.js"></script>
   </body>
 </html>

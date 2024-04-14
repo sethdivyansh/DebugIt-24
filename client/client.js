@@ -6,6 +6,11 @@ const enter_btn = document.querySelector(".enterBtn");
 const tic_tac_btns = document.querySelectorAll(".btn");
 const gameover_pop = document.querySelector(".game_over");
 const gameover_msg = document.querySelector(".winner");
+const back_to_home = document.querySelectorAll(".back_to_home");
+const squares = document.querySelector(".squares");
+const copy_code_btn = document.querySelector(".room_code");
+const copy_link_btn = document.querySelector(".copy_link_btn");
+const restart_btn = document.querySelector(".restart_button");
 let player_name;
 
 const winPatterns = [
@@ -19,12 +24,27 @@ const winPatterns = [
   [6, 7, 8],
 ];
 
+back_to_home.forEach((btn) =>
+  btn.addEventListener("click", () => {
+    window.location.href = `http://localhost:3000`;
+  })
+);
+
 enter_btn.addEventListener("click", () => {
   player_name = document.querySelector(".name").value.trim();
   if (player_name != false) {
     document.querySelector("#playerName").style.display = "none";
     socket.emit("join_room", { player_name: player_name, roomId: roomId });
+    copy_code_btn.innerText = roomId;
+    document.querySelector(".room_link").placeholder = window.location.href;
   }
+});
+
+copy_code_btn.addEventListener("click", () => {
+  navigator.clipboard.writeText(roomId);
+});
+copy_link_btn.addEventListener("click", () => {
+  navigator.clipboard.writeText(window.location.href);
 });
 
 tic_tac_btns.forEach((button) => {
@@ -45,6 +65,10 @@ tic_tac_btns.forEach((button) => {
   });
 });
 
+restart_btn.addEventListener("click", () => {
+  socket.emit("restart_game");
+});
+
 // Sockets
 
 socket.on("player_joined", (data) => {
@@ -56,13 +80,16 @@ socket.on("player_joined", (data) => {
       document.querySelector("#user_name").innerText = player_name;
 
       if (players.players.length == 2) {
+        // document.querySelector(".player_name").style.color = "gold";
         document.querySelector("#gameRoom").style.display = "block";
-        if (player_name == players.players[0])
+        document.querySelector(".waitingArea").style.display = "none";
+
+        if (player_name == players.players[0]) {
           document.querySelector("#opp_name").innerText = players.players[1];
-        else {
+        } else {
           document.querySelector("#opp_name").innerText = players.players[0];
         }
-        document.querySelector(".waitingMsg").style.display = "none";
+        // document.querySelector(".waitingMsg").style.display = "none";
       }
     })
     .catch((err) => {
@@ -89,6 +116,14 @@ socket.on("playing", (data) => {
   document.querySelector(".whose_turn").innerText = data.next_turn;
 });
 
+socket.on("restart_game", () => {
+  gameover_pop.style.display = "none";
+  tic_tac_btns.forEach((btn) => {
+    btn.disabled = false;
+    btn.innerText = "";
+  });
+});
+
 const check_win_loose = () => {
   for (let pattern of winPatterns) {
     const pos1val = tic_tac_btns[pattern[0]].innerText;
@@ -113,8 +148,8 @@ const game_over = (pos1val) => {
 };
 
 socket.on("room_full", () => {
-  const room_full = document.querySelector("#room_full_msg");
-  room_full.innerText = "Room is full";
+  const room_full = document.querySelector("#room_full");
+  room_full.style.display = "flex";
   setTimeout(function redirect_to_home_page() {
     window.location.href = `http://localhost:3000`;
   }, 10000);
