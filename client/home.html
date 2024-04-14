@@ -5,39 +5,131 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes shake {
+        0% {
+          transform: translateX(0);
+        }
+
+        20% {
+          transform: translateX(10px);
+        }
+
+        80% {
+          transform: translateX(0px);
+        }
+
+        60% {
+          transform: translateX(-10px);
+        }
+        40% {
+          transform: translateX(0);
+        }
+      }
+      .shake {
+        animation: shake 0.5s ease;
+      }
+    </style>
   </head>
-  <body>
+  <body
+    class="bg-[#171941] bg-contain bg-fixed"
+    style="background-image: url(./game/images/dots.png)"
+  >
     <div class="home">
-      <div class="createOrJoin">
-        <button class="createRoomBtn" onclick="createRoom()">
+      <div class="squares">
+        <div
+          class="squares square1 h-[18.75rem] left-[3%] opacity-[0.5] top-[-21%] w-[16.75rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square2 h-[25rem] right-[-5%] opacity-[0.4] top-[-12%] w-[25rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square3 h-[12.5rem] left-[-5%] bottom-0 opacity-[0.1] w-[12.5rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square4 h-[18.75rem] right-[-5%] bottom-0 opacity-[0.1] w-[18.75rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+        <div
+          class="squares square5 h-[15.625rem] bottom-[29%] left-[32%] opacity-[0.1] w-[15.625rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+
+        <div
+          class="squares square6 h-[5rem] left-[10%] top-[35%] bottom-0 opacity-[0.8] w-[5rem] absolute rounded-[20%] bg-gradient-to-r from-[#3358f4] to-[#1d8cf8]"
+        ></div>
+      </div>
+      <h1 class="text-[3.5rem] text-center text-white mt-[1rem]">
+        Tic-Tac-Toe!
+      </h1>
+
+      <div
+        class="createOrJoin text-white absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 text-center text-[1.75rem] font-semibold"
+      >
+        <h1 class="text-[3.5rem]">Hello!</h1>
+        <button
+          class="createRoomBtn bg-[#1d8cf8] rounded-lg w-[18rem] md:w-[30rem] p-[1rem] m-[1rem] font-thin bg-gradient-to-bl from-[#1d8cf8] via-[#1d66f8] to-[#3358f4]"
+          onclick="createRoom()"
+        >
           Create Room
         </button>
-        <p>or</p>
-        <p>Join with Code</p>
-        <div class="joinWithCode">
-          <input type="text" class="roomUniqueId" placeholder="Room id" />
-          <button class="joinRoomBtn" onclick="joinRoom()">Join</button>
+        <p class="text-[1.64rem] font-semibold">OR</p>
+        <p class="text-[1.64rem] font-semibold">Join with Code</p>
+        <div
+          class="joinWithCode flex flex-col md:flex-row items-center md:justify-between w-[30rem] m-[1rem]"
+        >
+          <input
+            type="text"
+            class="roomId font-thin border-[#2b3553] border-solid bg-transparent border-[1px] p-[1rem] rounded-lg w-[18rem] md:w-[20rem] mb-[0.75rem] md:mb-0"
+            placeholder="Room Code"
+          />
+          <button
+            class="joinRoomBtn bg-[#1d8cf8] rounded-lg font-thin w-[18rem] md:w-[8rem] p-[0.75rem] md:p-[1rem] bg-gradient-to-bl from-[#1d8cf8] via-[#1d66f8] to-[#3358f4]"
+            onclick="joinRoom()"
+          >
+            Join
+          </button>
         </div>
       </div>
     </div>
     <script>
-      const socket = io();
-      let create = false;
-
+      function GenerateCode(length) {
+        var result = "";
+        var characters =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+          result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+          );
+        }
+        return result;
+      }
       function createRoom() {
-        create = true;
-        socket.emit("createRoom");
+        let roomId = GenerateCode(6);
+        window.location.href = `http://localhost:3000/game/${roomId}`;
       }
 
       function joinRoom() {
-        create = false;
-        let roomUniqueId = document.querySelector(".roomUniqueId").value;
-        console.log(roomUniqueId);
-        socket.emit("joinRoom", { roomUniqueId: roomUniqueId });
+        let roomId = document.querySelector(".roomId").value;
+        fetch("/room_exists")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.rooms.hasOwnProperty(roomId)) {
+              window.location.href = `http://localhost:3000/game/${roomId}`;
+            } else {
+              console.log("Room not found");
+              document.querySelector(".roomId").classList.add("shake");
+              setTimeout(
+                () =>
+                  document.querySelector(".roomId").classList.remove("shake"),
+                1000
+              );
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
-      socket.on("roomId", (data) => {
-        window.location.href = `http://localhost:3000/game/${data.roomId}?gameHost=${create}`;
-      });
     </script>
   </body>
 </html>
