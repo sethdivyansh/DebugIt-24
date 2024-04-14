@@ -106,7 +106,7 @@
       }
       function createRoom() {
         let roomId = GenerateCode(6);
-        window.location.href = `http://localhost:3000/game/${roomId}`;
+        window.location.href = `${window.location.href}game/${roomId}`;
       }
 
       function joinRoom() {
@@ -115,7 +115,7 @@
           .then((res) => res.json())
           .then((data) => {
             if (data.rooms.hasOwnProperty(roomId)) {
-              window.location.href = `http://localhost:3000/game/${roomId}`;
+              window.location.href = `${window.location.href}game/${roomId}`;
             } else {
               console.log("Room not found");
               document.querySelector(".roomId").classList.add("shake");

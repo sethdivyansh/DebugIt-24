@@ -73,15 +73,6 @@ io.on("connection", (socket) => {
     socket.on("restart_game", () => {
       io.to(data.roomId).emit("restart_game");
     });
-
-    // socket.on("disconnect", () => {
-    //   if (rooms[data.roomId]) {
-    //     rooms[data.roomId] = rooms[data.roomId].filter(
-    //       (user) => user !== data.player_name
-    //     );
-    //     rooms[data];
-    //   }
-    // });
   });
 });
 
