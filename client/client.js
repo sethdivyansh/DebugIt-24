@@ -13,6 +13,16 @@ const copy_link_btn = document.querySelector(".copy_link_btn");
 const restart_btn = document.querySelector(".restart_button");
 let player_name;
 
+const currentUrl = window.location.href;
+
+// Create a URL object
+const url = new URL(currentUrl);
+
+// Extract the base URL
+const baseUrl = `${url.protocol}//${url.host}/`;
+
+console.log(baseUrl); // Output: http://localhost/
+
 const winPatterns = [
   [0, 1, 2],
   [0, 3, 6],
@@ -26,7 +36,7 @@ const winPatterns = [
 
 back_to_home.forEach((btn) =>
   btn.addEventListener("click", () => {
-    window.location.href = `http://localhost:3000`;
+    window.location.href = baseUrl;
   })
 );
 
@@ -151,6 +161,6 @@ socket.on("room_full", () => {
   const room_full = document.querySelector("#room_full");
   room_full.style.display = "flex";
   setTimeout(function redirect_to_home_page() {
-    window.location.href = `http://localhost:3000`;
+    window.location.href = baseUrl;
   }, 10000);
 });
