@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const path = require("path");
@@ -103,6 +104,6 @@ app.get("/players_in_room", (req, res) => {
   console.log("Server: Player join ");
 });
 
-server.listen(3000, () => {
-  console.log("Running on port: 3000");
+server.listen(process.env.PORT, () => {
+  console.log("Running on port: ", process.env.PORT);
 });
