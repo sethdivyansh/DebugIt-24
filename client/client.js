@@ -12,6 +12,7 @@ const copy_code_btn = document.querySelector(".room_code");
 const copy_link_btn = document.querySelector(".copy_link_btn");
 const restart_btn = document.querySelector(".restart_button");
 let player_name;
+let move_counter = 0;
 
 const currentUrl = window.location.href;
 
@@ -122,6 +123,8 @@ socket.on("playing", (data) => {
   let check = check_win_loose();
   if (check) {
     game_over(data.player_name);
+  } else {
+    is_game_draw();
   }
   document.querySelector(".whose_turn").innerText = data.next_turn;
 });
@@ -150,6 +153,24 @@ const check_win_loose = () => {
     }
   }
   return false;
+};
+
+const is_game_draw = () => {
+  let allButtonsDisabled = true;
+  tic_tac_btns.forEach((button) => {
+    if (!button.disabled) {
+      allButtonsDisabled = false;
+    }
+  });
+  if (allButtonsDisabled) {
+    console.log("Game draw");
+    gameover_pop.style.display = "flex";
+    gameover_msg.innerText = "Draw";
+    return true;
+  } else {
+    console.log("Not Draw");
+    return false;
+  }
 };
 
 const game_over = (pos1val) => {
